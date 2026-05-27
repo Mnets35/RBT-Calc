@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RBT Compensation & Level Progression Model</title>
+<title>RBT Cost-Neutral Alignment Model ($15 Base)</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -45,41 +45,37 @@
 <body>
 <div class="container">
   <header>
-    <h1>RBT Compensation & Career Ladder</h1>
-    <p>Guaranteed Base Security Net + Direct Service Adjustment Bonus</p>
+    <h1>RBT Compensation Tracker</h1>
+    <p>Guaranteed Base Safety Net + Direct Service Adjustment Bonus</p>
   </header>
 
   <div class="card">
     <div class="section-title">Step 1: Select Your Competency Level</div>
     <label for="level">RBT Mastery Level</label>
     <select id="level" onchange="calculate()">
-      <option value="1">Level 1 (Target Direct Rate: $21.50/hr)</option>
-      <option value="2">Level 2 (Target Direct Rate: $22.00/hr)</option>
-      <option value="3">Level 3 (Target Direct Rate: $22.50/hr)</option>
+      <option value="1">Level 1 (Target Direct Rate: $20.00/hr)</option>
+      <option value="2">Level 2 (Target Direct Rate: $21.00/hr)</option>
+      <option value="3">Level 3 (Target Direct Rate: $22.00/hr)</option>
       <option value="4">Level 4 (Target Direct Rate: $23.00/hr)</option>
-      <option value="5">Level 5 (Target Direct Rate: $23.50/hr)</option>
-      <option value="6">Level 6 (Target Direct Rate: $24.00/hr)</option>
-      <option value="7">Level 7 (Target Direct Rate: $24.50/hr)</option>
-      <option value="8">Level 8 (Target Direct Rate: $25.00/hr)</option>
-      <option value="9">Level 9 (Target Direct Rate: $25.50/hr)</option>
-      <option value="10">Level 10 (Target Direct Rate: $26.00/hr)</option>
-      <option value="11">Level 11 (Target Direct Rate: $27.00/hr)</option>
+      <option value="5">Level 5 (Target Direct Rate: $24.00/hr)</option>
+      <option value="6">Level 6 (Target Direct Rate: $25.00/hr)</option>
+      <option value="7">Level 7 (Target Direct Rate: $27.00/hr)</option>
     </select>
   </div>
 
   <div class="card">
-    <div class="section-title">Step 2: Anticipated Weekly Performance</div>
+    <div class="section-title">Step 2: Real-World Weekly Performance</div>
     <label for="performance-slider">Weekly Direct Billable Hours</label>
     <div class="slider-container">
-      <input type="range" id="performance-slider" min="0" max="40" value="30" oninput="calculate()">
-      <span class="slider-val" id="slider-display">30 hours</span>
+      <input type="range" id="performance-slider" min="0" max="35" value="20" oninput="calculate()">
+      <span class="slider-val" id="slider-display">20 hours</span>
     </div>
     
     <div class="stats-grid">
-      <div class="stat-box"><div class="label">Guaranteed Base Salary</div><div class="val">$32,640</div></div>
-      <div class="stat-box"><div class="label">Equivalent Indirect Rate</div><div class="val">$17.00 / hr</div></div>
-      <div class="stat-box"><div class="label">Equivalent Direct Rate</div><div class="val" id="direct-rate-display">$21.50 / hr</div></div>
-      <div class="stat-box"><div class="label">Bonus Rate Contribution</div><div class="val" id="bonus-rate-display">$4.50 / hr</div></div>
+      <div class="stat-box"><div class="label">Guaranteed Base Salary</div><div class="val">$28,800</div></div>
+      <div class="stat-box"><div class="label">Equivalent Indirect Floor</div><div class="val">$15.00 / hr</div></div>
+      <div class="stat-box"><div class="label">Equivalent Direct Rate</div><div class="val" id="direct-rate-display">$20.00 / hr</div></div>
+      <div class="stat-box"><div class="label">Bonus Rate Contribution</div><div class="val" id="bonus-rate-display">$5.00 / hr</div></div>
     </div>
   </div>
 
@@ -97,24 +93,20 @@
   </div>
 
   <div class="fine-print">
-    <p><strong>Note:</strong> Your base salary remains 100% guaranteed, absorbing cancellation variables and tracking your scheduled indirect clinical downtime hours safely at a $17.00/hr floor. Working direct case hours applies the adjustment bonus to ensure your active clinical time aligns exactly with your mastery level's hourly rate.</p>
+    <p><strong>Note:</strong> Your base salary remains 100% guaranteed, protecting your income against client cancellations and covering administrative downtime tasks at a $15.00/hr floor. Active clinical case hours apply the adjustment bonus to ensure your direct time aligns exactly with your mastery level's hourly rate framework.</p>
   </div>
 </div>
 
 <script>
-  // Expanded 11-level configuration object mapping to your requested $10 max bonus cap
+  // Safe matrix parameters mapped to a $15.00/hr internal base salary floor
   const levelConfigs = { 
-    "1": { direct: 21.50, bonus: 4.50 }, 
-    "2": { direct: 22.00, bonus: 5.00 }, 
-    "3": { direct: 22.50, bonus: 5.50 }, 
-    "4": { direct: 23.00, bonus: 6.00 }, 
-    "5": { direct: 23.50, bonus: 6.50 }, 
-    "6": { direct: 24.00, bonus: 7.00 },
-    "7": { direct: 24.50, bonus: 7.50 },
-    "8": { direct: 25.00, bonus: 8.00 },
-    "9": { direct: 25.50, bonus: 8.50 },
-    "10": { direct: 26.00, bonus: 9.00 },
-    "11": { direct: 27.00, bonus: 10.00 }
+    "1": { direct: 20.00, bonus: 5.00 }, 
+    "2": { direct: 21.00, bonus: 6.00 }, 
+    "3": { direct: 22.00, bonus: 7.00 }, 
+    "4": { direct: 23.00, bonus: 8.00 }, 
+    "5": { direct: 24.00, bonus: 9.00 }, 
+    "6": { direct: 25.00, bonus: 10.00 },
+    "7": { direct: 27.00, bonus: 12.00 }
   };
 
   function calculate() {
@@ -129,15 +121,16 @@
     
     let bonusUnits = volume;
     
+    // Balanced across a standard 48-week active production matrix
     const annualBonus = bonusUnits * config.bonus * 48;
-    const totalAnnual = 32640 + annualBonus;
+    const totalAnnual = 28800 + annualBonus;
     
     const totalMonthly = totalAnnual / 12;
-    const baseMonthly = 32640 / 12;
+    const baseMonthly = 28800 / 12;
     const bonusMonthly = annualBonus / 12;
     
     document.getElementById("total-compensation").textContent = "$" + Math.round(totalAnnual).toLocaleString();
-    document.getElementById("breakdown-text").textContent = "Base: $32,640 | Bonus: $" + Math.round(annualBonus).toLocaleString();
+    document.getElementById("breakdown-text").textContent = "Base: $28,800 | Bonus: $" + Math.round(annualBonus).toLocaleString();
     
     document.getElementById("monthly-compensation").textContent = "$" + Math.round(totalMonthly).toLocaleString();
     document.getElementById("monthly-breakdown-text").textContent = "Base: $" + Math.round(baseMonthly).toLocaleString() + " | Bonus: $" + Math.round(bonusMonthly).toLocaleString();
