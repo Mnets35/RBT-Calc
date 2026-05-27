@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RBT Compensation & Level Progression Model</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f4f6f8; --surface: #ffffff; --border: rgba(0,0,0,0.08);
+    --text: #1e293b; --text-light: #64748b; --accent: #0ea5e9;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); padding: 2rem 1rem; line-height: 1.5; }
+  .container { max-width: 700px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 2rem; background: #0f172a; color: white; padding: 2rem; border-radius: 12px; }
+  header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.5rem; }
+  header p { color: #94a3b8; font-size: 0.95rem; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+  .section-title { font-size: 0.85rem; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-light); margin-bottom: 1rem; }
+  label { display: block; font-size: 0.9rem; font-weight: 500; margin-bottom: 0.5rem; }
+  select, input[type=range] { width: 100%; padding: 0.6rem; border-radius: 6px; border: 1px solid #cbd5e1; font-family: inherit; font-size: 0.95rem; outline: none; }
+  .slider-container { display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem; }
+  input[type=range] { -webkit-appearance: none; height: 4px; background: #e2e8f0; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); cursor: pointer; }
+  .slider-val { font-family: 'DM Mono', monospace; font-weight: 600; min-width: 120px; text-align: right; font-size: 1.1rem; }
+  
+  .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem; background: #f8fafc; padding: 1rem; border-radius: 8px; }
+  .stat-box .label { font-size: 0.75rem; font-family: 'DM Mono', monospace; color: var(--text-light); text-transform: uppercase; }
+  .stat-box .val { font-size: 1.1rem; font-weight: 600; color: var(--text); }
+  
+  .payout-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 2rem; }
+  .total-card { background: #0f172a; color: white; text-align: center; padding: 1.5rem; border-radius: 12px; }
+  .total-card .label { font-size: 0.8rem; font-family: 'DM Mono', monospace; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.05em; }
+  .total-card .grand-total { font-size: 2.2rem; font-weight: 700; color: #f8fafc; margin: 0.25rem 0; }
+  .total-card .subtext { font-size: 0.8rem; color: #38bdf8; font-family: 'DM Mono', monospace; }
+  
+  .fine-print { margin-top: 2rem; padding: 1rem; border-top: 1px solid #e2e8f0; font-size: 0.85rem; color: var(--text-light); }
+  
+  @media (max-width: 550px) {
+    .payout-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>RBT Compensation & Career Ladder</h1>
+    <p>Guaranteed Base Security Net + Direct Service Adjustment Bonus</p>
+  </header>
+
+  <div class="card">
+    <div class="section-title">Step 1: Select Your Competency Level</div>
+    <label for="level">RBT Mastery Level</label>
+    <select id="level" onchange="calculate()">
+      <option value="1">Level 1 (Target Direct Rate: $21.50/hr)</option>
+      <option value="2">Level 2 (Target Direct Rate: $22.00/hr)</option>
+      <option value="3">Level 3 (Target Direct Rate: $22.50/hr)</option>
+      <option value="4">Level 4 (Target Direct Rate: $23.00/hr)</option>
+      <option value="5">Level 5 (Target Direct Rate: $23.50/hr)</option>
+      <option value="6">Level 6 (Target Direct Rate: $24.00/hr)</option>
+      <option value="7">Level 7 (Target Direct Rate: $24.50/hr)</option>
+      <option value="8">Level 8 (Target Direct Rate: $25.00/hr)</option>
+      <option value="9">Level 9 (Target Direct Rate: $25.50/hr)</option>
+      <option value="10">Level 10 (Target Direct Rate: $26.00/hr)</option>
+      <option value="11">Level 11 (Target Direct Rate: $27.00/hr)</option>
+    </select>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Step 2: Anticipated Weekly Performance</div>
+    <label for="performance-slider">Weekly Direct Billable Hours</label>
+    <div class="slider-container">
+      <input type="range" id="performance-slider" min="0" max="40" value="30" oninput="calculate()">
+      <span class="slider-val" id="slider-display">30 hours</span>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-box"><div class="label">Guaranteed Base Salary</div><div class="val">$32,640</div></div>
+      <div class="stat-box"><div class="label">Equivalent Indirect Rate</div><div class="val">$17.00 / hr</div></div>
+      <div class="stat-box"><div class="label">Equivalent Direct Rate</div><div class="val" id="direct-rate-display">$21.50 / hr</div></div>
+      <div class="stat-box"><div class="label">Bonus Rate Contribution</div><div class="val" id="bonus-rate-display">$4.50 / hr</div></div>
+    </div>
+  </div>
+
+  <div class="payout-grid">
+    <div class="total-card">
+      <div class="label">Estimated Annual Comp</div>
+      <div class="grand-total" id="total-compensation">$0</div>
+      <div class="subtext" id="breakdown-text">Base + Bonus</div>
+    </div>
+    <div class="total-card" style="background: #1e293b;">
+      <div class="label">Estimated Monthly Comp</div>
+      <div class="grand-total" id="monthly-compensation">$0</div>
+      <div class="subtext" id="monthly-breakdown-text">Avg Payout/Mo</div>
+    </div>
+  </div>
+
+  <div class="fine-print">
+    <p><strong>Note:</strong> Your base salary remains 100% guaranteed, absorbing cancellation variables and tracking your scheduled indirect clinical downtime hours safely at a $17.00/hr floor. Working direct case hours applies the adjustment bonus to ensure your active clinical time aligns exactly with your mastery level's hourly rate.</p>
+  </div>
+</div>
+
+<script>
+  // Expanded 11-level configuration object mapping to your requested $10 max bonus cap
+  const levelConfigs = { 
+    "1": { direct: 21.50, bonus: 4.50 }, 
+    "2": { direct: 22.00, bonus: 5.00 }, 
+    "3": { direct: 22.50, bonus: 5.50 }, 
+    "4": { direct: 23.00, bonus: 6.00 }, 
+    "5": { direct: 23.50, bonus: 6.50 }, 
+    "6": { direct: 24.00, bonus: 7.00 },
+    "7": { direct: 24.50, bonus: 7.50 },
+    "8": { direct: 25.00, bonus: 8.00 },
+    "9": { direct: 25.50, bonus: 8.50 },
+    "10": { direct: 26.00, bonus: 9.00 },
+    "11": { direct: 27.00, bonus: 10.00 }
+  };
+
+  function calculate() {
+    const level = document.getElementById("level").value;
+    const volume = parseFloat(document.getElementById("performance-slider").value);
+    
+    const config = levelConfigs[level];
+    
+    document.getElementById("slider-display").textContent = volume + " hours";
+    document.getElementById("direct-rate-display").textContent = "$" + config.direct.toFixed(2) + " / hr";
+    document.getElementById("bonus-rate-display").textContent = "$" + config.bonus.toFixed(2) + " / hr";
+    
+    let bonusUnits = volume;
+    
+    const annualBonus = bonusUnits * config.bonus * 48;
+    const totalAnnual = 32640 + annualBonus;
+    
+    const totalMonthly = totalAnnual / 12;
+    const baseMonthly = 32640 / 12;
+    const bonusMonthly = annualBonus / 12;
+    
+    document.getElementById("total-compensation").textContent = "$" + Math.round(totalAnnual).toLocaleString();
+    document.getElementById("breakdown-text").textContent = "Base: $32,640 | Bonus: $" + Math.round(annualBonus).toLocaleString();
+    
+    document.getElementById("monthly-compensation").textContent = "$" + Math.round(totalMonthly).toLocaleString();
+    document.getElementById("monthly-breakdown-text").textContent = "Base: $" + Math.round(baseMonthly).toLocaleString() + " | Bonus: $" + Math.round(bonusMonthly).toLocaleString();
+  }
+
+  calculate();
+</script>
+</body>
+</html>
