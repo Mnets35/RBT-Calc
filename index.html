@@ -3,140 +3,348 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RBT Cost-Neutral Alignment Model </title>
+<title>RBT Compensation & Category Overview</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #f4f6f8; --surface: #ffffff; --border: rgba(0,0,0,0.08);
-    --text: #1e293b; --text-light: #64748b; --accent: #0ea5e9;
+    --bg: #f4f6f8; 
+    --surface: #ffffff; 
+    --border: rgba(0,0,0,0.08);
+    --text: #1e293b; 
+    --text-light: #64748b; 
+    --accent: #f15233;       /* Active Tab & Slider Orange/Red */
+    --gold: #f9bb1e;         /* Subtext Accent */
+    --brand-dark: #414141;   /* Brand Charcoal Dark Header & Cards */
   }
   body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); padding: 2rem 1rem; line-height: 1.5; }
-  .container { max-width: 700px; margin: 0 auto; }
-  header { text-align: center; margin-bottom: 2rem; background: #0f172a; color: white; padding: 2rem; border-radius: 12px; }
-  header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.5rem; }
-  header p { color: #94a3b8; font-size: 0.95rem; }
+  .container { max-width: 750px; margin: 0 auto; }
+  
+  header { text-align: center; margin-bottom: 2rem; background: var(--brand-dark); color: white; padding: 2rem; border-radius: 12px; }
+  header .logo-img { max-width: 280px; width: 100%; height: auto; margin-bottom: 0.75rem; display: inline-block; }
+  header p { color: #cbd5e1; font-size: 0.95rem; }
+  
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-  .section-title { font-size: 0.85rem; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-light); margin-bottom: 1rem; }
+  .section-title { font-size: 0.85rem; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-light); margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+  
+  /* Category Selector Tabs */
+  .category-tabs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-bottom: 1rem; }
+  .tab-btn { background: #e2e8f0; border: none; padding: 0.8rem 0.5rem; border-radius: 8px; font-family: inherit; font-weight: 600; font-size: 0.95rem; color: #475569; cursor: pointer; transition: all 0.2s ease; text-align: center; }
+  .tab-btn.active { background: var(--accent); color: white; box-shadow: 0 2px 4px rgba(241, 82, 51, 0.3); }
+  
+  /* Input Grid */
+  .input-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem; }
+  .input-group { display: flex; flex-direction: column; gap: 0.4rem; }
+  .input-group label { font-size: 0.8rem; font-weight: 600; color: var(--text-light); }
+  .input-group select, .input-group input[type="date"] { padding: 0.6rem; border-radius: 6px; border: 1px solid #cbd5e1; font-family: inherit; font-size: 0.9rem; outline: none; }
+  .input-group select:focus, .input-group input:focus { border-color: var(--accent); }
+
+  /* Slider Controls */
   label { display: block; font-size: 0.9rem; font-weight: 500; margin-bottom: 0.5rem; }
-  select, input[type=range] { width: 100%; padding: 0.6rem; border-radius: 6px; border: 1px solid #cbd5e1; font-family: inherit; font-size: 0.95rem; outline: none; }
-  .slider-container { display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem; }
-  input[type=range] { -webkit-appearance: none; height: 4px; background: #e2e8f0; }
+  .slider-container { display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem; margin-bottom: 1.25rem; }
+  input[type=range] { width: 100%; -webkit-appearance: none; height: 6px; background: #e2e8f0; border-radius: 3px; outline: none; }
   input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); cursor: pointer; }
-  .slider-val { font-family: 'DM Mono', monospace; font-weight: 600; min-width: 120px; text-align: right; font-size: 1.1rem; }
+  .slider-val { font-family: 'DM Mono', monospace; font-weight: 600; min-width: 100px; text-align: right; font-size: 1.05rem; }
   
-  .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem; background: #f8fafc; padding: 1rem; border-radius: 8px; }
-  .stat-box .label { font-size: 0.75rem; font-family: 'DM Mono', monospace; color: var(--text-light); text-transform: uppercase; }
-  .stat-box .val { font-size: 1.1rem; font-weight: 600; color: var(--text); }
+  /* Stat Grid */
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem; background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid #e2e8f0; }
+  .stat-box { text-align: center; }
+  .stat-box .label { font-size: 0.72rem; font-family: 'DM Mono', monospace; color: var(--text-light); text-transform: uppercase; margin-bottom: 0.25rem; }
+  .stat-box .val { font-size: 1.15rem; font-weight: 700; color: var(--accent); }
   
-  .payout-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 2rem; }
-  .total-card { background: #0f172a; color: white; text-align: center; padding: 1.5rem; border-radius: 12px; }
+  /* Payout Cards */
+  .payout-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1.5rem; }
+  .total-card { background: var(--brand-dark); color: white; text-align: center; padding: 1.5rem; border-radius: 12px; }
   .total-card .label { font-size: 0.8rem; font-family: 'DM Mono', monospace; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.05em; }
-  .total-card .grand-total { font-size: 2.2rem; font-weight: 700; color: #f8fafc; margin: 0.25rem 0; }
-  .total-card .subtext { font-size: 0.8rem; color: #38bdf8; font-family: 'DM Mono', monospace; }
+  .total-card .grand-total { font-size: 2.1rem; font-weight: 700; color: #f8fafc; margin: 0.25rem 0; }
+  .total-card .subtext { font-size: 0.75rem; color: var(--gold); font-family: 'DM Mono', monospace; }
+  
+  /* Total Compensation Package Card */
+  .package-card { background: var(--brand-dark); color: white; text-align: center; padding: 1.5rem; border-radius: 12px; margin-top: 1rem; border: 2px solid var(--accent); }
+  .package-card .label { font-size: 0.85rem; font-family: 'DM Mono', monospace; text-transform: uppercase; color: #f8fafc; letter-spacing: 0.05em; font-weight: 600; }
+  .package-card .package-total { font-size: 2.5rem; font-weight: 800; color: #f9bb1e; margin: 0.25rem 0; }
+  .package-card .subtext { font-size: 0.8rem; color: #cbd5e1; line-height: 1.4; margin-top: 0.5rem; }
+
+  /* Dynamic Information Sections */
+  .info-box { border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem; line-height: 1.6; font-size: 0.9rem; }
+  .info-box h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+  .info-box ul { padding-left: 1.25rem; margin-top: 0.5rem; }
+  .info-box li { margin-bottom: 0.4rem; }
+  
+  .qual-box { background: #b8ddfb; border: 1px solid #93c5fd; color: #0c4a6e; }
+  .qual-box h3 { color: #075985; }
+  
+  .exp-box { background: #fca5a5; border: 1px solid #f87171; color: #7f1d1d; }
+  .exp-box h3 { color: #7f1d1d; }
+  
+  .benefits-box { background: #86efac; border: 1px solid #4ade80; color: #14532d; }
+  .benefits-box h3 { color: #14532d; }
   
   .fine-print { margin-top: 2rem; padding: 1rem; border-top: 1px solid #e2e8f0; font-size: 0.85rem; color: var(--text-light); }
   
-  @media (max-width: 550px) {
-    .payout-grid { grid-template-columns: 1fr; }
+  @media (max-width: 650px) {
+    .payout-grid, .category-tabs { grid-template-columns: 1fr; }
+    .input-grid, .stats-grid { grid-template-columns: 1fr; gap: 1rem; }
   }
 </style>
 </head>
 <body>
 <div class="container">
   <header>
-    <h1>RBT Compensation Tracker</h1>
-    <p>Guaranteed Base Safety Net + Direct Service Adjustment Bonus</p>
+    <!-- Replace with your actual logo path if needed -->
+    <img src="Logo.svg" alt="Not Your Everyday Therapy Services Logo" class="logo-img" onerror="this.style.display='none'">
+    <h2 style="margin-bottom: 0.25rem;">RBT Compensation Estimator</h2>
+    <p>Not Your Everyday Therapy Services</p>
   </header>
 
   <div class="card">
-    <div class="section-title">Step 1: Select Your Competency Level</div>
-    <label for="level">RBT Mastery Level</label>
-    <select id="level" onchange="calculate()">
-      <option value="1">Level 1 </option>
-      <option value="2">Level 2 </option>
-      <option value="3">Level 3 </option>
-      <option value="4">Level 4 </option>
-      <option value="5">Level 5 </option>
-      <option value="6">Level 6 </option>
-      <option value="7">Level 7 </option>
-    </select>
+    <div class="section-title">Step 1: Set RBT Profile & Status</div>
+    <div class="category-tabs">
+      <button class="tab-btn active" id="btn-FT" onclick="setStatus('FT')">Full-Time RBT</button>
+      <button class="tab-btn" id="btn-PT" onclick="setStatus('PT')">Part-Time RBT</button>
+    </div>
+
+    <div class="input-grid">
+      <div class="input-group">
+        <label>RBT Certification Date</label>
+        <!-- Defaults to today via JS to prevent errors on load -->
+        <input type="date" id="cert-date" onchange="calculate()">
+      </div>
+      <div class="input-group">
+        <label>Years Employed (NYETS)</label>
+        <select id="years-emp" onchange="calculate()">
+          <option value="0">Less than 1 year</option>
+          <option value="1">1 Year</option>
+          <option value="2">2 Years</option>
+          <option value="3">3 Years</option>
+          <option value="4">4 Years</option>
+          <option value="5">5+ Years</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Post-HS Education</label>
+        <select id="education" onchange="calculate()">
+          <option value="0">High School / Equivalent</option>
+          <option value="0.5">Associate's Degree (+$0.50)</option>
+          <option value="1">Bachelor's Degree (+$1.00)</option>
+          <option value="2">Master's Degree (+$2.00)</option>
+        </select>
+      </div>
+    </div>
   </div>
 
   <div class="card">
-    <div class="section-title">Step 2: Real-World Weekly Performance</div>
-    <label for="performance-slider">Weekly Direct Billable Hours</label>
+    <div class="section-title">Step 2: Anticipated Weekly Hours</div>
+    
+    <label for="billable-slider">Weekly Direct / Billable Hours</label>
     <div class="slider-container">
-      <input type="range" id="performance-slider" min="0" max="35" value="20" oninput="calculate()">
-      <span class="slider-val" id="slider-display">20 hours</span>
+      <input type="range" id="billable-slider" min="0" max="40" value="36" oninput="calculate()">
+      <span class="slider-val" id="disp-bill-hours">36 hrs</span>
+    </div>
+
+    <label for="indirect-slider">Weekly Indirect / Non-Billable Hours</label>
+    <div class="slider-container">
+      <input type="range" id="indirect-slider" min="0" max="15" value="2" oninput="calculate()">
+      <span class="slider-val" id="disp-indirect-hours">2 hrs</span>
     </div>
     
     <div class="stats-grid">
-      <div class="stat-box"><div class="label">Guaranteed Base Salary</div><div class="val">$28,800</div></div>
-      <div class="stat-box"><div class="label">Equivalent Indirect Floor</div><div class="val">$15.00 / hr</div></div>
-      <div class="stat-box"><div class="label">Equivalent Direct Rate</div><div class="val" id="direct-rate-display">$20.00 / hr</div></div>
-      <div class="stat-box"><div class="label">Bonus Rate Contribution</div><div class="val" id="bonus-rate-display">$5.00 / hr</div></div>
+      <div class="stat-box">
+        <div class="label">Calculated Billable Rate</div>
+        <div class="val" id="disp-billable-rate">$18.00 / hr</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">Non-Billable Rate</div>
+        <div class="val">$17.00 / hr</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">Max Allowed Ceiling</div>
+        <div class="val">$26.00 / hr</div>
+      </div>
     </div>
   </div>
 
   <div class="payout-grid">
     <div class="total-card">
-      <div class="label">Estimated Annual Comp</div>
-      <div class="grand-total" id="total-compensation">$0</div>
-      <div class="subtext" id="breakdown-text">Base + Bonus</div>
+      <div class="label">Estimated Annual Earnings</div>
+      <div class="grand-total" id="annual-earnings">$0</div>
+      <div class="subtext">Based on 52 working weeks</div>
     </div>
-    <div class="total-card" style="background: #1e293b;">
-      <div class="label">Estimated Monthly Comp</div>
-      <div class="grand-total" id="monthly-compensation">$0</div>
-      <div class="subtext" id="monthly-breakdown-text">Avg Payout/Mo</div>
+    <div class="total-card">
+      <div class="label">Estimated Per Paycheck</div>
+      <div class="grand-total" id="paycheck-earnings">$0</div>
+      <div class="subtext">Paid 2x per month (24 checks/yr)</div>
+    </div>
+  </div>
+
+  <div class="package-card" id="package-container">
+    <div class="label">Total Annual Compensation Package</div>
+    <div class="package-total" id="package-compensation">$0</div>
+    <div class="subtext">Includes W-2 Earnings + Employer Taxes Paid + Estimated Value of Allowances, Renewals, Healthcare, Holidays, and PTO</div>
+  </div>
+
+  <!-- Dynamic Content Panels -->
+  <div style="margin-top: 1.5rem;">
+    <div class="info-box qual-box">
+      <h3>Qualifications & Parameters</h3>
+      <p><strong>Focus:</strong> Providing Direct Clinical Service</p>
+      <p><strong>Pay Frequency:</strong> 2x per month (on the 11th and 26th of each month).</p>
+      <p style="margin-top:0.5rem;"><strong>Description:</strong> An individual who is new to the field of Applied Behavior Analysis (ABA) and has completed the necessary training and certification requirements to begin providing direct therapy under the supervision of a Board Certified Behavior Analyst (BCBA).</p>
+      <ul style="margin-top:0.5rem;">
+        <li>High school diploma or equivalent (a bachelor’s degree in psychology or a related field is often preferred but not required).</li>
+        <li>Completion of the RBT training program (at least 40 hours of instruction in ABA principles and practices).</li>
+        <li>Successful completion of the RBT competency assessment.</li>
+        <li>Successful completion of the RBT exam through the Behavior Analyst Certification Board (BACB).</li>
+      </ul>
+    </div>
+
+    <div class="info-box exp-box">
+      <h3>Expectations & Restrictions</h3>
+      <ul>
+        <li><strong>In-Office Requirement:</strong> 100% On-Site / In-Clinic / In-home presence required during scheduled client hours.</li>
+        <li><strong>Scheduling:</strong> Fixed, set scheduling template approved by the Clinical Director.</li>
+        <li><strong>Duties:</strong> Primary focus is direct clinical service.</li>
+      </ul>
+    </div>
+
+    <div class="info-box benefits-box">
+      <h3>Additional Benefits & Perks</h3>
+      <div id="content-benefits"></div>
     </div>
   </div>
 
   <div class="fine-print">
-    <p><strong>Note:</strong> Your base salary remains 100% guaranteed, protecting your income against client cancellations and covering administrative downtime tasks at a $15.00/hr floor. Active clinical case hours apply the adjustment bonus to ensure your direct time aligns exactly with your mastery level's hourly rate framework.</p>
+    <p><strong>Note:</strong> Earnings are estimates based on provided inputs. Overtime or exact schedules may cause variations. Billable rate factors: $18 base + $0.50/yr certified + $0.50/yr employed + Degree factor (Assoc +$0.50, Bach +$1.00, Master +$2.00). Rate hard-capped at $26.00/hr.</p>
   </div>
 </div>
 
 <script>
-  // Safe matrix parameters mapped to a $15.00/hr internal base salary floor
-  const levelConfigs = { 
-    "1": { direct: 20.00, bonus: 5.00 }, 
-    "2": { direct: 21.00, bonus: 6.00 }, 
-    "3": { direct: 22.00, bonus: 7.00 }, 
-    "4": { direct: 23.00, bonus: 8.00 }, 
-    "5": { direct: 24.00, bonus: 9.00 }, 
-    "6": { direct: 25.00, bonus: 10.00 },
-    "7": { direct: 27.00, bonus: 12.00 }
-  };
+  let empStatus = 'FT';
 
-  function calculate() {
-    const level = document.getElementById("level").value;
-    const volume = parseFloat(document.getElementById("performance-slider").value);
+  // Initialize the date picker to today to prevent NaN errors on first load
+  document.addEventListener("DOMContentLoaded", () => {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('cert-date').value = today;
+    setStatus('FT');
+  });
+
+  function setStatus(status) {
+    empStatus = status;
+    document.getElementById('btn-FT').classList.remove('active');
+    document.getElementById('btn-PT').classList.remove('active');
+    document.getElementById('btn-' + status).classList.add('active');
     
-    const config = levelConfigs[level];
+    // Hide the total comp package for part-timers since benefits differ vastly
+    document.getElementById('package-container').style.display = (status === 'FT') ? 'block' : 'none';
     
-    document.getElementById("slider-display").textContent = volume + " hours";
-    document.getElementById("direct-rate-display").textContent = "$" + config.direct.toFixed(2) + " / hr";
-    document.getElementById("bonus-rate-display").textContent = "$" + config.bonus.toFixed(2) + " / hr";
-    
-    let bonusUnits = volume;
-    
-    // Balanced across a standard 48-week active production matrix
-    const annualBonus = bonusUnits * config.bonus * 48;
-    const totalAnnual = 28800 + annualBonus;
-    
-    const totalMonthly = totalAnnual / 12;
-    const baseMonthly = 28800 / 12;
-    const bonusMonthly = annualBonus / 12;
-    
-    document.getElementById("total-compensation").textContent = "$" + Math.round(totalAnnual).toLocaleString();
-    document.getElementById("breakdown-text").textContent = "Base: $28,800 | Bonus: $" + Math.round(annualBonus).toLocaleString();
-    
-    document.getElementById("monthly-compensation").textContent = "$" + Math.round(totalMonthly).toLocaleString();
-    document.getElementById("monthly-breakdown-text").textContent = "Base: $" + Math.round(baseMonthly).toLocaleString() + " | Bonus: $" + Math.round(bonusMonthly).toLocaleString();
+    calculate();
   }
 
-  calculate();
+  function calculate() {
+    // 1. Get Inputs
+    const certDateInput = document.getElementById('cert-date').value;
+    const yearsEmp = parseInt(document.getElementById('years-emp').value);
+    const eduBump = parseFloat(document.getElementById('education').value);
+    
+    const billHours = parseFloat(document.getElementById('billable-slider').value);
+    const indirectHours = parseFloat(document.getElementById('indirect-slider').value);
+    
+    // Update Slider Displays
+    document.getElementById('disp-bill-hours').textContent = billHours + " hrs";
+    document.getElementById('disp-indirect-hours').textContent = indirectHours + " hrs";
+
+    // 2. Calculate Years Certified
+    let yearsCert = 0;
+    if (certDateInput) {
+      const certDate = new Date(certDateInput);
+      const today = new Date();
+      // Calculate difference in years
+      yearsCert = Math.floor((today - certDate) / (1000 * 60 * 60 * 24 * 365.25));
+      if (yearsCert < 0) yearsCert = 0; 
+    }
+
+    // 3. Calculate Direct Billable Rate
+    let billableRate = 18.00; // Base Rate
+    billableRate += (yearsEmp * 0.50);
+    billableRate += (yearsCert * 0.50);
+    billableRate += eduBump;
+    
+    // Apply Ceiling
+    if (billableRate > 26.00) {
+      billableRate = 26.00;
+    }
+
+    const nonBillableRate = 17.00;
+
+    // Update UI for Rate
+    document.getElementById('disp-billable-rate').textContent = "$" + billableRate.toFixed(2) + " / hr";
+
+    // 4. Calculate Earnings
+    const weeklyEarnings = (billHours * billableRate) + (indirectHours * nonBillableRate);
+    const annualEarnings = weeklyEarnings * 52; 
+    const paycheckEarnings = annualEarnings / 24; // Paid 2x per month
+
+    document.getElementById('annual-earnings').textContent = "$" + Math.round(annualEarnings).toLocaleString();
+    document.getElementById('paycheck-earnings').textContent = "$" + Math.round(paycheckEarnings).toLocaleString();
+
+    // 5. Benefits Logic & HTML Output
+    let benefitsHTML = `<ul>
+      <li><strong>Mileage Reimbursement:</strong> Billed at the Federal Rate (taxed as income per federal laws).</li>
+      <li><strong>OKABA Conference:</strong> Paid by company ($25.00 value).</li>`;
+      
+    let totalBenefitsValue = 25; // OKABA base value
+
+    if (empStatus === 'PT') {
+      benefitsHTML += `
+        <li><strong>Liability Insurance:</strong> First year covered by company ($75–$150 value).</li>
+        <li><strong>Company Apparel:</strong> $50 annual allowance.</li>
+      </ul>`;
+      
+    } else {
+      // Full Time Benefits
+      benefitsHTML += `
+        <li><strong>Liability Insurance:</strong> Paid annually by company ($75–$150 value).</li>
+        <li><strong>CPR Training:</strong> Ongoing training paid by company.</li>
+        <li><strong>Company Apparel:</strong> $100 annual allowance.</li>
+        <li><strong>Paid Holidays:</strong> 6 designated holidays paid at your direct billable rate.</li>`;
+        
+      totalBenefitsValue += 115; // Liability avg
+      totalBenefitsValue += 50;  // CPR
+      totalBenefitsValue += 100; // Apparel
+      totalBenefitsValue += (6 * 8 * billableRate); // 6 Holidays at 8 hours
+
+      // PTO Logic
+      if (yearsEmp >= 3) {
+        benefitsHTML += `<li><strong>Paid Time Off (PTO):</strong> Accrued up to 100 hours per year (up to 3 months roll over).</li>`;
+        totalBenefitsValue += (100 * billableRate);
+      } else {
+        benefitsHTML += `<li><strong>Paid Time Off (PTO):</strong> Accrued up to 80 hours per year (up to 3 months roll over).</li>`;
+        totalBenefitsValue += (80 * billableRate);
+      }
+
+      // Tenure Bonuses (2+ Years)
+      if (yearsEmp >= 2) {
+        benefitsHTML += `
+          <li><strong>RBT License Renewal:</strong> Covered by company ($50 value).</li>
+          <li><strong>PDU Allowance:</strong> $100 allowance to maintain RBT license.</li>`;
+        totalBenefitsValue += 150;
+      }
+
+      benefitsHTML += `
+        <li><strong>Healthcare Options:</strong> Available for FT employees.</li>
+        <li><strong>Employer Tax Contributions:</strong> Standard payroll taxes paid on your behalf.</li>
+      </ul>`;
+      
+      // Calculate Total Package for FT (Earnings + Perks + Est Taxes/Healthcare)
+      const estimatedEmployerTaxes = annualEarnings * 0.0765; // standard FICA estimate
+      const estimatedHealthcareCont = 1800; // baseline estimate, adjust as needed
+      
+      const grandTotalPackage = annualEarnings + totalBenefitsValue + estimatedEmployerTaxes + estimatedHealthcareCont;
+      document.getElementById('package-compensation').textContent = "$" + Math.round(grandTotalPackage).toLocaleString();
+    }
+
+    document.getElementById('content-benefits').innerHTML = benefitsHTML;
+  }
 </script>
 </body>
 </html>
