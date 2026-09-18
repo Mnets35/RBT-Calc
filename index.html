@@ -87,15 +87,14 @@
   .input-group select, .input-group input[type="date"] { padding: 0.6rem; border-radius: 6px; border: 1px solid #cbd5e1; font-family: inherit; font-size: 0.9rem; outline: none; transition: border 0.2s ease; }
   .input-group select:focus, .input-group input:focus { border-color: var(--accent); }
 
-  /* Slider Controls */
   label { display: block; font-size: 0.9rem; font-weight: 500; margin-bottom: 0.5rem; }
   .slider-container { display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem; margin-bottom: 1.25rem; }
   input[type=range] { width: 100%; -webkit-appearance: none; height: 6px; background: #e2e8f0; border-radius: 3px; outline: none; }
   input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); cursor: pointer; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
   .slider-val { font-family: 'DM Mono', monospace; font-weight: 600; min-width: 100px; text-align: right; font-size: 1.05rem; color: var(--brand-dark); }
   
-  /* Stat Grid */
-  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem; background: #f8fafc; padding: 1.25rem; border-radius: 8px; border: 1px solid #e2e8f0; }
+  /* Stat Grid - Exactly 2 columns */
+  .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem; background: #f8fafc; padding: 1.25rem; border-radius: 8px; border: 1px solid #e2e8f0; }
   .stat-box { text-align: center; }
   .stat-box .label { font-size: 0.72rem; font-family: 'DM Mono', monospace; color: var(--text-light); text-transform: uppercase; margin-bottom: 0.25rem; }
   .stat-box .val { font-size: 1.25rem; font-weight: 700; color: var(--accent); }
@@ -135,8 +134,8 @@
 <div class="container">
   <header>
     <img src="Logo.svg" alt="NYETS Logo" onerror="this.style.display='none'">
-    <h1>Not Your Everyday Therapy Services</h1>
-    <h2>RBT Compensation Estimator</h2>
+    <h1>RBT Compensation Estimator</h1>
+    <h2>Not Your Everyday Therapy Services</h2>
   </header>
 
   <div class="card">
@@ -198,10 +197,6 @@
         <div class="label">Non-Billable Rate</div>
         <div class="val">$17.00 / hr</div>
       </div>
-      <div class="stat-box">
-        <div class="label">Maximum Cap</div>
-        <div class="val">$26.00 / hr</div>
-      </div>
     </div>
   </div>
 
@@ -209,7 +204,7 @@
     <div class="total-card">
       <div class="label">Estimated Annual Earnings</div>
       <div class="grand-total" id="annual-earnings">$0</div>
-      <div class="subtext">Based on 52 working weeks</div>
+      <div class="subtext">Based on 48 working weeks</div>
     </div>
     <div class="total-card">
       <div class="label">Estimated Per Paycheck</div>
@@ -254,15 +249,14 @@
   </div>
 
   <div class="fine-print">
-    <p><strong>Note:</strong> Earnings are estimates based on provided inputs. Overtime or exact schedules may cause variations. Billable rate factors: $18 base + $0.50/yr certified + $0.50/yr employed + Degree factor. Rate hard-capped at $26.00/hr.</p>
+    <p><strong>Note:</strong> Earnings are estimates based on provided inputs. Overtime or exact schedules may cause variations. Billable rate factors: $18 base + $0.50/yr certified + $0.50/yr employed + Degree factor. Rate capped based on company policy.</p>
   </div>
 </div>
 
 <script>
   let empStatus = 'FT';
 
-  // Initialize the date picker to exactly one year ago just to show a default, 
-  // or default to today so no immediate years are added without user intent.
+  // Initialize the date picker to today to establish a baseline
   document.addEventListener("DOMContentLoaded", () => {
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('cert-date').value = today;
@@ -310,7 +304,7 @@
     billableRate += (yearsCert * 0.50);
     billableRate += eduBump;
     
-    // Apply $26 Ceiling
+    // Apply strict $26 Ceiling logic (Hidden from UI but enforced in code)
     if (billableRate > 26.00) {
       billableRate = 26.00;
     }
@@ -320,9 +314,9 @@
     // Update UI for Rate
     document.getElementById('disp-billable-rate').textContent = "$" + billableRate.toFixed(2) + " / hr";
 
-    // 4. Calculate Earnings
+    // 4. Calculate Earnings based on 48 weeks instead of 52
     const weeklyEarnings = (billHours * billableRate) + (indirectHours * nonBillableRate);
-    const annualEarnings = weeklyEarnings * 52; 
+    const annualEarnings = weeklyEarnings * 48; // Updated to 48 weeks!
     const paycheckEarnings = annualEarnings / 24; 
 
     document.getElementById('annual-earnings').textContent = "$" + Math.round(annualEarnings).toLocaleString();
