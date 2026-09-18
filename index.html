@@ -178,8 +178,8 @@
     
     <label for="billable-slider">Weekly Direct / Billable Hours</label>
     <div class="slider-container">
-      <input type="range" id="billable-slider" min="0" max="40" value="36" oninput="calculate()">
-      <span class="slider-val" id="disp-bill-hours">36 hrs</span>
+      <input type="range" id="billable-slider" min="0" max="40" value="32" oninput="calculate()">
+      <span class="slider-val" id="disp-bill-hours">32 hrs</span>
     </div>
 
     <label for="indirect-slider">Weekly Indirect / Non-Billable Hours</label>
@@ -271,6 +271,17 @@
     
     // Hide the total comp package for part-timers since benefits differ vastly
     document.getElementById('package-container').style.display = (status === 'FT') ? 'block' : 'none';
+    
+    // Update slider defaults based on status
+    const billSlider = document.getElementById('billable-slider');
+    const indirectSlider = document.getElementById('indirect-slider');
+    if (status === 'FT') {
+      billSlider.value = 32;
+      indirectSlider.value = 2;
+    } else {
+      billSlider.value = 15;
+      indirectSlider.value = 1;
+    }
     
     calculate();
   }
