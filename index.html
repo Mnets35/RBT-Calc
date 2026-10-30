@@ -141,28 +141,26 @@
   <div class="card">
     <div class="section-title">Step 1: RBT Profile & Employment Status</div>
     <div class="category-tabs">
-      <button class="tab-btn active" id="btn-FT" onclick="setStatus('FT')">Full-Time RBT</button>
-      <button class="tab-btn" id="btn-PT" onclick="setStatus('PT')">Part-Time RBT</button>
+      <button class="tab-btn active" id="btn-FT" type="button" onclick="setStatus('FT')">Full-Time RBT</button>
+      <button class="tab-btn" id="btn-PT" type="button" onclick="setStatus('PT')">Part-Time RBT</button>
     </div>
 
     <div class="input-grid">
       <div class="input-group">
-        <label>RBT Certification Date</label>
+        <label for="cert-date">RBT Certification Date</label>
         <input type="date" id="cert-date" onchange="calculate()">
       </div>
       <div class="input-group">
-        <label>Years Employed (NETS)</label>
+        <label for="years-emp">Years Employed (NETS)</label>
         <select id="years-emp" onchange="calculate()">
           <option value="0">Less than 1 year</option>
           <option value="1">1 Year</option>
           <option value="2">2 Years</option>
-          <option value="3">3 Years</option>
-          <option value="4">4 Years</option>
-          <option value="5">5+ Years</option>
+          <option value="3">3+ Years</option>
         </select>
       </div>
       <div class="input-group">
-        <label>Post-HS Education</label>
+        <label for="education">Post-HS Education</label>
         <select id="education" onchange="calculate()">
           <option value="0">High School / Equivalent</option>
           <option value="0.5">Associate's Degree</option>
@@ -254,13 +252,7 @@
 </div>
 
 <script>
-  let empStatus = 'FT';
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('cert-date').value = today;
-    setStatus('FT');
-  });
+  var empStatus = 'FT';
 
   function setStatus(status) {
     empStatus = status;
@@ -268,10 +260,13 @@
     document.getElementById('btn-PT').classList.remove('active');
     document.getElementById('btn-' + status).classList.add('active');
     
-    document.getElementById('package-container').style.display = (status === 'FT') ? 'block' : 'none';
+    var pkgBox = document.getElementById('package-container');
+    if (pkgBox) {
+      pkgBox.style.display = (status === 'FT') ? 'block' : 'none';
+    }
     
-    const billSlider = document.getElementById('billable-slider');
-    const indirectSlider = document.getElementById('indirect-slider');
+    var billSlider = document.getElementById('billable-slider');
+    var indirectSlider = document.getElementById('indirect-slider');
     if (status === 'FT') {
       billSlider.value = 32;
       indirectSlider.value = 2;
@@ -284,25 +279,27 @@
   }
 
   function calculate() {
-    const certDateInput = document.getElementById('cert-date').value;
-    const yearsEmp = parseInt(document.getElementById('years-emp').value);
-    const eduBump = parseFloat(document.getElementById('education').value);
+    var certDateInput = document.getElementById('cert-date').value;
+    var yearsEmpSelect = document.getElementById('years-emp');
+    var yearsEmp = parseInt(yearsEmpSelect.value, 10) || 0;
+    var eduBump = parseFloat(document.getElementById('education').value) || 0;
     
-    const billHours = parseFloat(document.getElementById('billable-slider').value);
-    const indirectHours = parseFloat(document.getElementById('indirect-slider').value);
+    var billHours = parseFloat(document.getElementById('billable-slider').value) || 0;
+    var indirectHours = parseFloat(document.getElementById('indirect-slider').value) || 0;
     
     document.getElementById('disp-bill-hours').textContent = billHours + " hrs";
     document.getElementById('disp-indirect-hours').textContent = indirectHours + " hrs";
 
-    let yearsCert = 0;
+    var yearsCert = 0;
     if (certDateInput) {
-      const certDate = new Date(certDateInput);
-      const today = new Date();
-      yearsCert = Math.floor((today - certDate) / (1000 * 60 * 60 * 24 * 365.25));
-      if (yearsCert < 0) yearsCert = 0;
+      var certDate = new Date(certDateInput);
+      var today = new Date();
+      var diffTime = today.getTime() - certDate.getTime();
+      yearsCert = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 365.25));
+      if (yearsCert < 0) { yearsCert = 0; }
     }
 
-    let billableRate = 18.00;
+    var billableRate = 18.00;
     billableRate += (yearsEmp * 0.50);
     billableRate += (yearsCert * 0.50);
     billableRate += eduBump;
@@ -311,24 +308,99 @@
       billableRate = 26.00;
     }
 
-    const nonBillableRate = 15.00;
+    var nonBillableRate = 15.00;
 
     document.getElementById('disp-billable-rate').textContent = "$" + billableRate.toFixed(2) + " / hr";
 
-    const weeklyEarnings = (billHours * billableRate) + (indirectHours * nonBillableRate);
-    const annualEarnings = weeklyEarnings * 48;
-    const paycheckEarnings = annualEarnings / 24; 
+    var weeklyEarnings = (billHours * billableRate) + (indirectHours * nonBillableRate);
+    var annualEarnings = weeklyEarnings * 48;
+    var paycheckEarnings = annualEarnings / 24; 
 
     document.getElementById('annual-earnings').textContent = "$" + Math.round(annualEarnings).toLocaleString();
     document.getElementById('paycheck-earnings').textContent = "$" + Math.round(paycheckEarnings).toLocaleString();
 
-    let benefitsHTML = "";
-    let totalBenefitsValue = 0;
+    var benefitsHTML = "";
+    var totalBenefitsValue = 0;
 
     if (empStatus === 'PT') {
-      benefitsHTML = `<ul>
-        <li><strong>Mileage:</strong> Federal Rate (taxed as income due to federal tax laws).</li>
-        <li><strong>Liability Insurance:</strong> $120.00 value.</li>
-        <li><strong>CPR Training:</strong> $150.00 value.</li>
-        <li><strong>Company Apparel Allowance:</strong> $50.00 per year.</li>
-        <li><strong>Estimated State & Federal Taxes:</strong> Medicare & Social Security paid on your behalf.</li>
+      benefitsHTML = "<ul>" +
+        "<li><strong>Mileage:</strong> Federal Rate (taxed as income due to federal tax laws).</li>" +
+        "<li><strong>Liability Insurance:</strong> $120.00 value.</li>" +
+        "<li><strong>CPR Training:</strong> $150.00 value.</li>" +
+        "<li><strong>Company Apparel Allowance:</strong> $50.00 per year.</li>" +
+        "<li><strong>Estimated State and Federal Taxes:</strong> Medicare and Social Security paid on your behalf.</li>" +
+      "</ul>";
+      totalBenefitsValue = 120 + 150 + 50;
+    } else {
+      var holidayPay = 6 * billableRate;
+      var ptoHoursCap = 80;
+      var ptoRateText = "0.0385 \u00D7 Hours Worked";
+
+      if (yearsEmp >= 3) {
+        ptoHoursCap = 120;
+        ptoRateText = "0.0577 \u00D7 Hours Worked";
+      } else if (yearsEmp === 2) {
+        ptoHoursCap = 100;
+        ptoRateText = "0.0481 \u00D7 Hours Worked";
+      }
+
+      var ptoValue = ptoHoursCap * billableRate;
+      var baseFixed = 25 + 120 + 150 + 100; // OKABA ($25) + Liability ($120) + CPR ($150) + Apparel ($100)
+
+      benefitsHTML = "<ul>" +
+        "<li><strong>Mileage:</strong> Federal Rate (taxed as income due to federal tax laws).</li>" +
+        "<li><strong>6 Paid Holidays:</strong> Paid at your direct clinical rate.</li>" +
+        "<li><strong>PTO Accrual:</strong> Accrued by hours worked per pay period (" + ptoRateText + ") with a cap of " + ptoHoursCap + " hours. Up to 3 mo. (90 days) can be rolled over at the end of each year.</li>" +
+        "<li><strong>OKABA State Conference:</strong> Paid each year ($25.00 value).</li>" +
+        "<li><strong>Liability Insurance:</strong> $120.00 value.</li>" +
+        "<li><strong>CPR Training:</strong> $150.00 value.</li>" +
+        "<li><strong>Company Apparel Allowance:</strong> $100.00 per year.</li>";
+
+      if (yearsEmp === 2) {
+        benefitsHTML += "<li><strong>RBT License:</strong> $50.00.</li>" +
+          "<li><strong>PDU Allowance:</strong> $100.00.</li>";
+        totalBenefitsValue = baseFixed + 50 + 100 + holidayPay + ptoValue;
+      } else if (yearsEmp >= 3) {
+        var pduDaysPay = 2 * billableRate;
+        benefitsHTML += "<li><strong>RBT License:</strong> $50.00.</li>" +
+          "<li><strong>PDU Allowance:</strong> $150.00.</li>" +
+          "<li><strong>2 Paid PDU Days:</strong> Paid at your direct clinical rate.</li>";
+        totalBenefitsValue = baseFixed + 50 + 150 + pduDaysPay + holidayPay + ptoValue;
+      } else {
+        totalBenefitsValue = baseFixed + holidayPay + ptoValue;
+      }
+
+      benefitsHTML += "<li><strong>Health Care Benefit:</strong> Upon election (Renewal in April of each year).</li>" +
+        "<li><strong>Estimated State and Federal Taxes:</strong> Medicare and Social Security paid on your behalf.</li>" +
+      "</ul>";
+
+      var estimatedEmployerTaxes = annualEarnings * 0.0765; 
+      var estimatedHealthcareCont = 1800; 
+      
+      var grandTotalPackage = annualEarnings + totalBenefitsValue + estimatedEmployerTaxes + estimatedHealthcareCont;
+      var pkgDisplay = document.getElementById('package-compensation');
+      if (pkgDisplay) {
+        pkgDisplay.textContent = "$" + Math.round(grandTotalPackage).toLocaleString();
+      }
+    }
+
+    var benefitsContainer = document.getElementById('content-benefits');
+    if (benefitsContainer) {
+      benefitsContainer.innerHTML = benefitsHTML;
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', function() {
+    var today = new Date();
+    var yyyy = today.getFullYear();
+    var mm = String(today.getMonth() + 1).padStart(2, '0');
+    var dd = String(today.getDate()).padStart(2, '0');
+    var dateField = document.getElementById('cert-date');
+    if (dateField) {
+      dateField.value = yyyy + '-' + mm + '-' + dd;
+    }
+    setStatus('FT');
+  });
+</script>
+</body>
+</html>
