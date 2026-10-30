@@ -118,9 +118,9 @@
   .info-box ul { padding-left: 1.25rem; margin-top: 0.5rem; }
   .info-box li { margin-bottom: 0.4rem; }
   
-  .qual-box { background: #e0f2fe; border: 1px solid #bae6fd; color: #0c4a6e; }
-  .exp-box { background: #fee2e2; border: 1px solid #fecaca; color: #7f1d1d; }
-  .benefits-box { background: #dcfce7; border: 1px solid #bbf7d0; color: #14532d; }
+  .qual-box { background: #b8ddfb; border: 1px solid #93c5fd; color: #0c4a6e; }
+  .exp-box { background: #DD5555; border: 1px solid #c84444; color: #ffffff; }
+  .benefits-box { background: #48C76A; border: 1px solid #36b057; color: #0a3818; }
   
   .fine-print { margin-top: 2rem; padding: 1rem; border-top: 1px solid #e2e8f0; font-size: 0.85rem; color: var(--text-light); text-align: center; }
   
@@ -151,7 +151,7 @@
         <input type="date" id="cert-date" onchange="calculate()">
       </div>
       <div class="input-group">
-        <label>Years Employed (NYETS)</label>
+        <label>Years Employed (NETS)</label>
         <select id="years-emp" onchange="calculate()">
           <option value="0">Less than 1 year</option>
           <option value="1">1 Year</option>
@@ -165,9 +165,9 @@
         <label>Post-HS Education</label>
         <select id="education" onchange="calculate()">
           <option value="0">High School / Equivalent</option>
-          <option value="0.5">Associate's Degree (+$0.50)</option>
-          <option value="1">Bachelor's Degree (+$1.00)</option>
-          <option value="2">Master's Degree (+$2.00)</option>
+          <option value="0.5">Associate's Degree</option>
+          <option value="1">Bachelor's Degree</option>
+          <option value="2">Master's Degree</option>
         </select>
       </div>
     </div>
@@ -195,7 +195,7 @@
       </div>
       <div class="stat-box">
         <div class="label">Non-Billable Rate</div>
-        <div class="val">$17.00 / hr</div>
+        <div class="val">$15.00 / hr</div>
       </div>
     </div>
   </div>
@@ -237,7 +237,7 @@
       <h3>Expectations & Restrictions</h3>
       <ul>
         <li><strong>In-Office Requirement:</strong> 100% On-Site / In-Clinic / In-home presence required during scheduled client hours.</li>
-        <li><strong>Scheduling:</strong> Fixed, set scheduling template approved by the Clinical Director.</li>
+        <li><strong>Scheduling:</strong> Fixed, set scheduling template approved by the Clinical Director. PTO is accrued based on hours worked and must be applied when requesting off from work.</li>
         <li><strong>Duties:</strong> Primary focus is direct clinical service.</li>
       </ul>
     </div>
@@ -256,7 +256,6 @@
 <script>
   let empStatus = 'FT';
 
-  // Initialize the date picker to today to establish a baseline
   document.addEventListener("DOMContentLoaded", () => {
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('cert-date').value = today;
@@ -269,10 +268,8 @@
     document.getElementById('btn-PT').classList.remove('active');
     document.getElementById('btn-' + status).classList.add('active');
     
-    // Hide the total comp package for part-timers since benefits differ vastly
     document.getElementById('package-container').style.display = (status === 'FT') ? 'block' : 'none';
     
-    // Update slider defaults based on status
     const billSlider = document.getElementById('billable-slider');
     const indirectSlider = document.getElementById('indirect-slider');
     if (status === 'FT') {
@@ -287,7 +284,6 @@
   }
 
   function calculate() {
-    // 1. Get Inputs
     const certDateInput = document.getElementById('cert-date').value;
     const yearsEmp = parseInt(document.getElementById('years-emp').value);
     const eduBump = parseFloat(document.getElementById('education').value);
@@ -295,102 +291,44 @@
     const billHours = parseFloat(document.getElementById('billable-slider').value);
     const indirectHours = parseFloat(document.getElementById('indirect-slider').value);
     
-    // Update Slider Displays
     document.getElementById('disp-bill-hours').textContent = billHours + " hrs";
     document.getElementById('disp-indirect-hours').textContent = indirectHours + " hrs";
 
-    // 2. Calculate Years Certified
     let yearsCert = 0;
     if (certDateInput) {
       const certDate = new Date(certDateInput);
       const today = new Date();
-      // Calculate full difference in years
       yearsCert = Math.floor((today - certDate) / (1000 * 60 * 60 * 24 * 365.25));
-      if (yearsCert < 0) yearsCert = 0; // Prevent negative years if future date chosen
+      if (yearsCert < 0) yearsCert = 0;
     }
 
-    // 3. Calculate Direct Billable Rate
-    let billableRate = 18.00; // Base Rate
+    let billableRate = 18.00;
     billableRate += (yearsEmp * 0.50);
     billableRate += (yearsCert * 0.50);
     billableRate += eduBump;
     
-    // Apply strict $26 Ceiling logic (Hidden from UI but enforced in code)
     if (billableRate > 26.00) {
       billableRate = 26.00;
     }
 
-    const nonBillableRate = 17.00;
+    const nonBillableRate = 15.00;
 
-    // Update UI for Rate
     document.getElementById('disp-billable-rate').textContent = "$" + billableRate.toFixed(2) + " / hr";
 
-    // 4. Calculate Earnings based on 48 weeks instead of 52
     const weeklyEarnings = (billHours * billableRate) + (indirectHours * nonBillableRate);
-    const annualEarnings = weeklyEarnings * 48; // Updated to 48 weeks!
+    const annualEarnings = weeklyEarnings * 48;
     const paycheckEarnings = annualEarnings / 24; 
 
     document.getElementById('annual-earnings').textContent = "$" + Math.round(annualEarnings).toLocaleString();
     document.getElementById('paycheck-earnings').textContent = "$" + Math.round(paycheckEarnings).toLocaleString();
 
-    // 5. Benefits Logic & HTML Output
-    let benefitsHTML = `<ul>
-      <li><strong>Mileage Reimbursement:</strong> Billed at the Federal Rate (taxed as income per federal laws).</li>
-      <li><strong>OKABA Conference:</strong> Paid by company ($25.00 value).</li>`;
-      
-    let totalBenefitsValue = 25; // Base value shared by both
+    let benefitsHTML = "";
+    let totalBenefitsValue = 0;
 
     if (empStatus === 'PT') {
-      benefitsHTML += `
-        <li><strong>Liability Insurance:</strong> First year covered by company ($75–$150 value).</li>
-        <li><strong>Company Apparel:</strong> $50 annual allowance.</li>
-      </ul>`;
-      
-    } else {
-      // Full Time Benefits
-      benefitsHTML += `
-        <li><strong>Liability Insurance:</strong> Paid annually by company ($75–$150 value).</li>
-        <li><strong>CPR Training:</strong> Ongoing training paid by company.</li>
-        <li><strong>Company Apparel:</strong> $100 annual allowance.</li>
-        <li><strong>Paid Holidays:</strong> 6 designated holidays paid at your direct billable rate.</li>`;
-        
-      totalBenefitsValue += 112.5; // Average Liability cost
-      totalBenefitsValue += 50;  // Est CPR cost
-      totalBenefitsValue += 100; // Apparel
-      totalBenefitsValue += (6 * 8 * billableRate); // 6 Holidays at 8 hours
-
-      // PTO Logic
-      if (yearsEmp >= 3) {
-        benefitsHTML += `<li><strong>Paid Time Off (PTO):</strong> Accrued up to 100 hours per year (up to 3 months roll over).</li>`;
-        totalBenefitsValue += (100 * billableRate);
-      } else {
-        benefitsHTML += `<li><strong>Paid Time Off (PTO):</strong> Accrued up to 80 hours per year (up to 3 months roll over).</li>`;
-        totalBenefitsValue += (80 * billableRate);
-      }
-
-      // Tenure Bonuses (2+ Years)
-      if (yearsEmp >= 2) {
-        benefitsHTML += `
-          <li><strong>RBT License Renewal:</strong> Covered by company ($50 value).</li>
-          <li><strong>PDU Allowance:</strong> $100 allowance to maintain RBT license.</li>`;
-        totalBenefitsValue += 150;
-      }
-
-      benefitsHTML += `
-        <li><strong>Healthcare Options:</strong> Available for FT employees.</li>
-        <li><strong>Employer Tax Contributions:</strong> Standard payroll taxes paid on your behalf.</li>
-      </ul>`;
-      
-      // Calculate Total Package for FT 
-      const estimatedEmployerTaxes = annualEarnings * 0.0765; 
-      const estimatedHealthcareCont = 1800; 
-      
-      const grandTotalPackage = annualEarnings + totalBenefitsValue + estimatedEmployerTaxes + estimatedHealthcareCont;
-      document.getElementById('package-compensation').textContent = "$" + Math.round(grandTotalPackage).toLocaleString();
-    }
-
-    document.getElementById('content-benefits').innerHTML = benefitsHTML;
-  }
-</script>
-</body>
-</html>
+      benefitsHTML = `<ul>
+        <li><strong>Mileage:</strong> Federal Rate (taxed as income due to federal tax laws).</li>
+        <li><strong>Liability Insurance:</strong> $120.00 value.</li>
+        <li><strong>CPR Training:</strong> $150.00 value.</li>
+        <li><strong>Company Apparel Allowance:</strong> $50.00 per year.</li>
+        <li><strong>Estimated State & Federal Taxes:</strong> Medicare & Social Security paid on your behalf.</li>
