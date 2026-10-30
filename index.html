@@ -75,16 +75,20 @@
     padding-bottom: 0.5rem; 
   }
   
-  /* Category Selector Tabs */
-  .category-tabs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1.25rem; }
-  .tab-btn { background: #e2e8f0; border: none; padding: 0.8rem 0.5rem; border-radius: 8px; font-family: inherit; font-weight: 600; font-size: 0.95rem; color: #475569; cursor: pointer; transition: all 0.2s ease; text-align: center; }
+  /* Mode and Status Tabs */
+  .mode-selector { margin-bottom: 1.25rem; background: #f8fafc; padding: 0.75rem; border-radius: 10px; border: 1px solid #e2e8f0; }
+  .mode-label { font-size: 0.75rem; font-family: 'DM Mono', monospace; text-transform: uppercase; color: var(--text-light); margin-bottom: 0.5rem; display: block; font-weight: 600; }
+  .category-tabs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+  
+  .tab-btn { background: #e2e8f0; border: none; padding: 0.75rem 0.5rem; border-radius: 8px; font-family: inherit; font-weight: 600; font-size: 0.9rem; color: #475569; cursor: pointer; transition: all 0.2s ease; text-align: center; }
   .tab-btn.active { background: var(--accent); color: white; box-shadow: 0 2px 4px rgba(241, 82, 51, 0.3); }
   
   /* Input Grid */
-  .input-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem; }
+  .input-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem; }
+  .input-grid.current-mode { grid-template-columns: repeat(2, 1fr); }
   .input-group { display: flex; flex-direction: column; gap: 0.4rem; }
   .input-group label { font-size: 0.8rem; font-weight: 600; color: var(--text-light); }
-  .input-group select, .input-group input[type="date"] { padding: 0.6rem; border-radius: 6px; border: 1px solid #cbd5e1; font-family: inherit; font-size: 0.9rem; outline: none; transition: border 0.2s ease; }
+  .input-group select, .input-group input[type="date"], .input-group input[type="number"] { padding: 0.6rem; border-radius: 6px; border: 1px solid #cbd5e1; font-family: inherit; font-size: 0.9rem; outline: none; transition: border 0.2s ease; }
   .input-group select:focus, .input-group input:focus { border-color: var(--accent); }
 
   label { display: block; font-size: 0.9rem; font-weight: 500; margin-bottom: 0.5rem; }
@@ -93,7 +97,7 @@
   input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); cursor: pointer; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
   .slider-val { font-family: 'DM Mono', monospace; font-weight: 600; min-width: 100px; text-align: right; font-size: 1.05rem; color: var(--brand-dark); }
   
-  /* Stat Grid - Exactly 2 columns */
+  /* Stat Grid */
   .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem; background: #f8fafc; padding: 1.25rem; border-radius: 8px; border: 1px solid #e2e8f0; }
   .stat-box { text-align: center; }
   .stat-box .label { font-size: 0.72rem; font-family: 'DM Mono', monospace; color: var(--text-light); text-transform: uppercase; margin-bottom: 0.25rem; }
@@ -126,7 +130,7 @@
   
   @media (max-width: 700px) {
     .payout-grid, .category-tabs { grid-template-columns: 1fr; }
-    .input-grid, .stats-grid { grid-template-columns: 1fr; gap: 1rem; }
+    .input-grid, .input-grid.current-mode, .stats-grid { grid-template-columns: 1fr; gap: 1rem; }
   }
 </style>
 </head>
@@ -139,20 +143,33 @@
   </header>
 
   <div class="card">
-    <div class="section-title">Step 1: RBT Profile & Employment Status</div>
+    <div class="section-title">Step 1: Role Type & Profile</div>
+    
+    <!-- Role Mode Toggle: New Hire vs. Current Team Member -->
+    <div class="mode-selector">
+      <span class="mode-label">Review Mode:</span>
+      <div class="category-tabs">
+        <button class="tab-btn active" id="mode-new" type="button" onclick="setMode('new')">Candidate / New Hire</button>
+        <button class="tab-btn" id="mode-current" type="button" onclick="setMode('current')">Current Team Member</button>
+      </div>
+    </div>
+
+    <!-- Employment Status -->
+    <span class="mode-label" style="margin-top: 0.5rem;">Employment Status:</span>
     <div class="category-tabs">
       <button class="tab-btn active" id="btn-FT" type="button" onclick="setStatus('FT')">Full-Time RBT</button>
       <button class="tab-btn" id="btn-PT" type="button" onclick="setStatus('PT')">Part-Time RBT</button>
     </div>
 
-    <div class="input-grid">
+    <!-- Candidate Mode Fields -->
+    <div class="input-grid" id="new-hire-fields">
       <div class="input-group">
         <label for="cert-date">RBT Certification Date</label>
         <input type="date" id="cert-date" onchange="calculate()">
       </div>
       <div class="input-group">
         <label for="years-emp">Years Employed (NETS)</label>
-        <select id="years-emp" onchange="calculate()">
+        <select id="years-emp" onchange="syncYearsAndCalculate(this.value)">
           <option value="0">Less than 1 year</option>
           <option value="1">1 Year</option>
           <option value="2">2 Years</option>
@@ -166,6 +183,23 @@
           <option value="0.5">Associate's Degree</option>
           <option value="1">Bachelor's Degree</option>
           <option value="2">Master's Degree</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Current Employee Mode Fields -->
+    <div class="input-grid current-mode" id="current-employee-fields" style="display: none;">
+      <div class="input-group">
+        <label for="custom-billable-rate">Current Direct Billable Rate ($/hr)</label>
+        <input type="number" id="custom-billable-rate" step="0.25" min="15.00" max="35.00" value="20.00" oninput="calculate()">
+      </div>
+      <div class="input-group">
+        <label for="years-emp-current">Years Employed (NETS)</label>
+        <select id="years-emp-current" onchange="syncYearsAndCalculate(this.value)">
+          <option value="0">Less than 1 year</option>
+          <option value="1">1 Year</option>
+          <option value="2">2 Years</option>
+          <option value="3" selected>3+ Years</option>
         </select>
       </div>
     </div>
@@ -214,7 +248,7 @@
   <div class="package-card" id="package-container">
     <div class="label">Total Annual Compensation Package</div>
     <div class="package-total" id="package-compensation">$0</div>
-    <div class="subtext">Includes W-2 Earnings + Employer Taxes Paid + Estimated Value of Allowances, Renewals, Healthcare, Holidays, and PTO</div>
+    <div class="subtext">Includes W-2 Earnings + Employer Taxes Paid + Value of 2027 Allowances, Renewals, Healthcare, Holidays, and PTO</div>
   </div>
 
   <div style="margin-top: 1.5rem;">
@@ -222,12 +256,12 @@
       <h3>Qualifications & Parameters</h3>
       <p><strong>Focus:</strong> Providing Direct Clinical Service</p>
       <p><strong>Pay Frequency:</strong> 2x per month (on the 11th and 26th of each month).</p>
-      <p style="margin-top:0.5rem;"><strong>Description:</strong> An individual who is new to the field of Applied Behavior Analysis (ABA) and has completed the necessary training and certification requirements to begin providing direct therapy under the supervision of a Board Certified Behavior Analyst (BCBA).</p>
+      <p style="margin-top:0.5rem;"><strong>Description:</strong> An individual who provides direct therapy under the supervision of a Board Certified Behavior Analyst (BCBA).</p>
       <ul style="margin-top:0.5rem;">
-        <li>High school diploma or equivalent (a bachelor’s degree in psychology or a related field is often preferred but not required).</li>
-        <li>Completion of the RBT training program (at least 40 hours of instruction in ABA principles and practices).</li>
-        <li>Successful completion of the RBT competency assessment.</li>
-        <li>Successful completion of the RBT exam through the Behavior Analyst Certification Board (BACB).</li>
+        <li>High school diploma or equivalent.</li>
+        <li>Completion of 40-hour RBT training curriculum.</li>
+        <li>Successful completion of RBT competency assessment.</li>
+        <li>Active RBT credential in good standing through the BACB.</li>
       </ul>
     </div>
 
@@ -247,12 +281,29 @@
   </div>
 
   <div class="fine-print">
-    <p><strong>Note:</strong> Earnings are estimates based on provided inputs. Overtime or exact schedules may cause variations. Billable rate factors: $18 base + $0.50/yr certified + $0.50/yr employed + Degree factor. Rate capped based on company policy.</p>
+    <p><strong>Note:</strong> Indirect/non-billable hours are compensated at $15.00/hr. Total package estimates include employer-paid FICA, healthcare contributions upon election, and benefit allowances.</p>
   </div>
 </div>
 
 <script>
+  var currentMode = 'new';
   var empStatus = 'FT';
+
+  function setMode(mode) {
+    currentMode = mode;
+    document.getElementById('mode-new').classList.remove('active');
+    document.getElementById('mode-current').classList.remove('active');
+    document.getElementById('mode-' + mode).classList.add('active');
+
+    if (mode === 'new') {
+      document.getElementById('new-hire-fields').style.display = 'grid';
+      document.getElementById('current-employee-fields').style.display = 'none';
+    } else {
+      document.getElementById('new-hire-fields').style.display = 'none';
+      document.getElementById('current-employee-fields').style.display = 'grid';
+    }
+    calculate();
+  }
 
   function setStatus(status) {
     empStatus = status;
@@ -278,34 +329,46 @@
     calculate();
   }
 
+  function syncYearsAndCalculate(val) {
+    document.getElementById('years-emp').value = val;
+    document.getElementById('years-emp-current').value = val;
+    calculate();
+  }
+
   function calculate() {
-    var certDateInput = document.getElementById('cert-date').value;
-    var yearsEmpSelect = document.getElementById('years-emp');
-    var yearsEmp = parseInt(yearsEmpSelect.value, 10) || 0;
-    var eduBump = parseFloat(document.getElementById('education').value) || 0;
-    
     var billHours = parseFloat(document.getElementById('billable-slider').value) || 0;
     var indirectHours = parseFloat(document.getElementById('indirect-slider').value) || 0;
     
     document.getElementById('disp-bill-hours').textContent = billHours + " hrs";
     document.getElementById('disp-indirect-hours').textContent = indirectHours + " hrs";
 
-    var yearsCert = 0;
-    if (certDateInput) {
-      var certDate = new Date(certDateInput);
-      var today = new Date();
-      var diffTime = today.getTime() - certDate.getTime();
-      yearsCert = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 365.25));
-      if (yearsCert < 0) { yearsCert = 0; }
-    }
-
+    var yearsEmp = parseInt(document.getElementById('years-emp').value, 10) || 0;
     var billableRate = 18.00;
-    billableRate += (yearsEmp * 0.50);
-    billableRate += (yearsCert * 0.50);
-    billableRate += eduBump;
-    
-    if (billableRate > 26.00) {
-      billableRate = 26.00;
+
+    if (currentMode === 'new') {
+      var certDateInput = document.getElementById('cert-date').value;
+      var eduBump = parseFloat(document.getElementById('education').value) || 0;
+      
+      var yearsCert = 0;
+      if (certDateInput) {
+        var certDate = new Date(certDateInput);
+        var today = new Date();
+        var diffTime = today.getTime() - certDate.getTime();
+        yearsCert = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 365.25));
+        if (yearsCert < 0) { yearsCert = 0; }
+      }
+
+      billableRate += (yearsEmp * 0.50);
+      billableRate += (yearsCert * 0.50);
+      billableRate += eduBump;
+
+      if (billableRate > 26.00) {
+        billableRate = 26.00;
+      }
+    } else {
+      // Current employee mode takes their grandfathered direct rate
+      var customRateInput = parseFloat(document.getElementById('custom-billable-rate').value);
+      billableRate = (!isNaN(customRateInput) && customRateInput > 0) ? customRateInput : 20.00;
     }
 
     var nonBillableRate = 15.00;
